@@ -18,6 +18,8 @@ package com.oracle.adbaoverjdbc;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
+
+import jdk.incubator.sql2.Result;
 import jdk.incubator.sql2.SqlException;
 import jdk.incubator.sql2.SqlType;
 
@@ -25,19 +27,19 @@ import jdk.incubator.sql2.SqlType;
  * Result of the given database operation.
  */
 
-abstract class Result {
+abstract class ResultJdbc {
     
-    static jdk.incubator.sql2.Result.RowCount newRowCount(long c) {
-        return new Result.RowCount(c);
+    static Result.RowCount newRowCount(long c) {
+        return new ResultJdbc.RowCountJdbc(c);
     }
     
-    static Result.RowColumn newRowColumn(RowBaseOperation op) {
-        return new Result.RowColumn(op);
+    static ResultJdbc.RowColumnJdbc newRowColumn(RowBaseOperation op) {
+        return new ResultJdbc.RowColumnJdbc(op);
     }
     
-    static jdk.incubator.sql2.Result.OutColumn newOutColumn(OutOperationJdbc op) {
+    static Result.OutColumn newOutColumn(OutOperationJdbc op) {
       try {
-        return new Result.OutColumn(op, 
+        return new ResultJdbc.OutColumnJdbc(op, 
                                     op.jdbcCallableStmt()
                                       .getParameterMetaData()
                                       .getParameterCount());
@@ -58,11 +60,11 @@ abstract class Result {
      * system. There also may be non-numeric return values that Result.Count
      * could express, eg success but number unknown.
      */
-    private static final class RowCount implements jdk.incubator.sql2.Result.RowCount {
+    private static final class RowCountJdbc implements Result.RowCount {
 
         private long count = -1;
 
-        public RowCount(long c) {
+        public RowCountJdbc(long c) {
             count = c;
         }
 
@@ -80,8 +82,8 @@ abstract class Result {
      * accept absolute column/parameter indexes. The indexes are never
      * relative to the first column in a sliced sequence. 
      */
-    private static abstract class Column 
-      implements jdk.incubator.sql2.Result.Column, AutoCloseable {
+    private static abstract class ColumnJdbc 
+      implements Result.Column, AutoCloseable {
 
       private volatile boolean isClosed = false; // all slices and clones share this
       private int columnIndex = -1;
@@ -93,7 +95,7 @@ abstract class Result {
        * or clone use clone() for that.
        * @param sequenceLength The number columns in this sequence.
        */
-      Column(int sequenceLength) {
+      ColumnJdbc(int sequenceLength) {
         columnIndex = sequenceLength > 0 ? 1 : 0;
         columnOffset = 0;
         lastColumn = sequenceLength;
@@ -251,10 +253,10 @@ abstract class Result {
       }
 
       @Override
-      public Result.Column clone() {
+      public ResultJdbc.ColumnJdbc clone() {
         assertOpen();
         try {
-          return (Result.Column) super.clone();
+          return (ResultJdbc.ColumnJdbc) super.clone();
         } catch (CloneNotSupportedException ex) {
           throw new RuntimeException("TODO", ex);
         }
@@ -305,12 +307,12 @@ abstract class Result {
       }
     }
     
-    static final class RowColumn extends Column 
-      implements jdk.incubator.sql2.Result.RowColumn {
+    static final class RowColumnJdbc extends ColumnJdbc 
+      implements Result.RowColumn {
         
       private final RowBaseOperation rowOp;
       
-      RowColumn(RowBaseOperation op) {
+      RowColumnJdbc(RowBaseOperation op) {
         super(op.getIdentifiers().length);
         rowOp = op;
       }
@@ -367,12 +369,12 @@ abstract class Result {
       }
     }
     
-    private static final class OutColumn extends Column 
-      implements jdk.incubator.sql2.Result.OutColumn {
+    private static final class OutColumnJdbc extends ColumnJdbc 
+      implements Result.OutColumn {
         
       private final OutOperationJdbc outOp;
       
-      OutColumn(OutOperationJdbc op, int sequenceLength) {
+      OutColumnJdbc(OutOperationJdbc op, int sequenceLength) {
         super(sequenceLength);
         outOp = op;
       }

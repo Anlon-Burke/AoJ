@@ -15,16 +15,18 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import jdk.incubator.sql2.SessionProperty;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.LongConsumer;
+
+import jdk.incubator.sql2.DataSource;
 import jdk.incubator.sql2.DataSourceProperty;
+import jdk.incubator.sql2.SessionProperty;
 
 /**
  *
  */
-class DataSourceBuilderJdbc implements jdk.incubator.sql2.DataSource.Builder {
+class DataSourceBuilderJdbc implements DataSource.Builder {
 
   static DataSourceBuilderJdbc newDataSourceBuilder() {
     return new DataSourceBuilderJdbc();
@@ -45,7 +47,7 @@ class DataSourceBuilderJdbc implements jdk.incubator.sql2.DataSource.Builder {
   Map<SessionProperty, Object> requiredSessionProperties = new HashMap<>();
 
   @Override
-  public jdk.incubator.sql2.DataSource.Builder property(DataSourceProperty property, Object value) {
+  public DataSource.Builder property(DataSourceProperty property, Object value) {
     if (isBuilt) {
       throw new IllegalStateException("TODO");
     }
@@ -63,7 +65,7 @@ class DataSourceBuilderJdbc implements jdk.incubator.sql2.DataSource.Builder {
   }
 
   @Override
-  public jdk.incubator.sql2.DataSource.Builder defaultSessionProperty(SessionProperty property, Object value) {
+  public DataSource.Builder defaultSessionProperty(SessionProperty property, Object value) {
     if (isBuilt) {
       throw new IllegalStateException("TODO");
     }
@@ -84,7 +86,7 @@ class DataSourceBuilderJdbc implements jdk.incubator.sql2.DataSource.Builder {
   }
 
   @Override
-  public jdk.incubator.sql2.DataSource.Builder sessionProperty(SessionProperty property, Object value) {
+  public DataSource.Builder sessionProperty(SessionProperty property, Object value) {
     if (isBuilt) {
       throw new IllegalStateException("TODO");
     }
@@ -105,12 +107,12 @@ class DataSourceBuilderJdbc implements jdk.incubator.sql2.DataSource.Builder {
   }
 
   @Override
-  public jdk.incubator.sql2.DataSource.Builder requestHook(LongConsumer request) {
+  public DataSource.Builder requestHook(LongConsumer request) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public jdk.incubator.sql2.DataSource build() {
+  public DataSource build() {
     if (isBuilt) {
       throw new IllegalStateException("cannot build more than once. All objects are use-once");
     }

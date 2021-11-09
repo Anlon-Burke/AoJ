@@ -16,15 +16,6 @@
 package com.oracle.adbaoverjdbc;
 
 import java.sql.CallableStatement;
-import jdk.incubator.sql2.AdbaSessionProperty;
-import jdk.incubator.sql2.SessionProperty;
-import jdk.incubator.sql2.Operation;
-import jdk.incubator.sql2.ShardingKey;
-import jdk.incubator.sql2.Session;
-import jdk.incubator.sql2.SqlException;
-import jdk.incubator.sql2.TransactionOutcome;
-
-import java.sql.CallableStatement;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -38,6 +29,16 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executor;
 import java.util.function.LongConsumer;
 import java.util.logging.Level;
+
+import jdk.incubator.sql2.AdbaSessionProperty;
+import jdk.incubator.sql2.Operation;
+import jdk.incubator.sql2.OperationGroup;
+import jdk.incubator.sql2.Session;
+import jdk.incubator.sql2.SessionProperty;
+import jdk.incubator.sql2.ShardingKey;
+import jdk.incubator.sql2.SqlException;
+import jdk.incubator.sql2.Submission;
+import jdk.incubator.sql2.TransactionOutcome;
 
 /**
  * Session is a subclass of OperationGroup. The member Operation stuff is mostly
@@ -57,14 +58,14 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   // STATIC
   protected static final CompletionStage<Object> ROOT = CompletableFuture.completedFuture(null);
 
-  static jdk.incubator.sql2.Session newSession(DataSourceJdbc ds,
+  static Session newSession(DataSourceJdbc ds,
                                                   Map<SessionProperty, Object> properties) {
     return new SessionJdbc(ds, properties);
   }
 
   // FIELDS
   private Lifecycle sessionLifecycle = Lifecycle.NEW;
-  private final Set<jdk.incubator.sql2.Session.SessionLifecycleListener> lifecycleListeners;
+  private final Set<Session.SessionLifecycleListener> lifecycleListeners;
   private final DataSourceJdbc dataSource;
   private final Map<SessionProperty, Object> properties;
 
@@ -93,7 +94,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
         "Session lifecycle is: " + getSessionLifecycle());
     }
     return addMember(
-      com.oracle.adbaoverjdbc.SimpleOperation.<Void>newOperation(
+      SimpleOperation.<Void>newOperation(
         this, this, this::jdbcConnect));
   }
 
@@ -101,7 +102,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   public Operation<Void> validationOperation(Validation depth) {
     assertOpen();
     return addMember(
-      com.oracle.adbaoverjdbc.SimpleOperation.<Void>newOperation(
+      SimpleOperation.<Void>newOperation(
         this, this, op -> jdbcValidate(op, depth)));
   }
 
@@ -109,12 +110,12 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   public Operation<Void> closeOperation() {
     assertOpen();
     return addMember(
-      com.oracle.adbaoverjdbc.UnskippableOperation.<Void>newOperation(
+      UnskippableOperation.<Void>newOperation(
         this, this, this::jdbcClose));  //TODO cannot be skipped
   }
 
   @Override
-  public <S, T> jdk.incubator.sql2.OperationGroup<S, T> operationGroup() {
+  public <S, T> OperationGroup<S, T> operationGroup() {
     assertOpen();
     return addMember(OperationGroupJdbc.newOperationGroup(this));
   }
@@ -144,7 +145,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   }
 
   @Override
-  public jdk.incubator.sql2.Session abort() {
+  public Session abort() {
     if (sessionLifecycle == Lifecycle.ABORTING 
        || sessionLifecycle == Lifecycle.CLOSED) { 
       return this;
@@ -184,7 +185,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   }
 
   @Override
-  public jdk.incubator.sql2.Session requestHook(LongConsumer request) {
+  public Session requestHook(LongConsumer request) {
     assertOpen();
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
@@ -226,11 +227,11 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   }
 
   @Override
-  jdk.incubator.sql2.Submission<Object> submit(com.oracle.adbaoverjdbc.OperationJdbc<Object> op) {
+  Submission<Object> submit(OperationJdbc<Object> op) {
     if (op == this) {
       // submitting the Session OperationGroup
       sessionCF = (CompletableFuture<Object>)attachCompletionHandler(op.follows(ROOT, getExecutor()));
-      return com.oracle.adbaoverjdbc.SubmissionJdbc.submit(this::cancel, sessionCF);
+      return SubmissionJdbc.submit(this::cancel, sessionCF);
     }
     else {
       return super.submit(op);
@@ -249,7 +250,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   
   // JDBC operations. These are all blocking
   
-  private Void jdbcConnect(com.oracle.adbaoverjdbc.OperationJdbc<Void> op) {
+  private Void jdbcConnect(OperationJdbc<Void> op) {
     try {
       Properties info = (Properties)properties.get(ConnectionPropertiesJdbc.JDBC_CONNECTION_PROPERTIES);
       info = (Properties)(info == null ? ConnectionPropertiesJdbc.JDBC_CONNECTION_PROPERTIES.defaultValue() 
@@ -287,7 +288,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
     }
   }
 
-  private Void jdbcValidate(com.oracle.adbaoverjdbc.OperationJdbc<Void> op,
+  private Void jdbcValidate(OperationJdbc<Void> op,
                             Validation depth) {
     try {
     switch (depth) {
@@ -316,7 +317,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   }
   
   
-  protected <T> T jdbcExecute(com.oracle.adbaoverjdbc.OperationJdbc<T> op, String sql) {
+  protected <T> T jdbcExecute(OperationJdbc<T> op, String sql) {
     try (java.sql.Statement stmt = jdbcConnection.createStatement()) {
       int timeoutSeconds = (int) (op.getTimeoutMillis() / 1000L);
       if (timeoutSeconds < 0) stmt.setQueryTimeout(timeoutSeconds);
@@ -329,7 +330,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
     return null;
   }
 
-  private Void jdbcClose(com.oracle.adbaoverjdbc.OperationJdbc<Void> op) {
+  private Void jdbcClose(OperationJdbc<Void> op) {
     try {
       setLifecycle(sessionLifecycle.close());
       if (jdbcConnection != null) {

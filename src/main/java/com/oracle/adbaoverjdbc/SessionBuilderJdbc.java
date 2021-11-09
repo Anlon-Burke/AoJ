@@ -15,12 +15,15 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import jdk.incubator.sql2.SessionProperty;
+import static com.oracle.adbaoverjdbc.ConnectionPropertiesJdbc.JDBC_CONNECTION_PROPERTIES;
+import static com.oracle.adbaoverjdbc.ConnectionPropertiesJdbc.SENSITIVE_JDBC_CONNECTION_PROPERTIES;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.oracle.adbaoverjdbc.ConnectionPropertiesJdbc.*;
+import jdk.incubator.sql2.Session;
+import jdk.incubator.sql2.SessionProperty;
 
 /**
  * A builder to create an AoJ session. The AoJ session creates a JDBC
@@ -38,7 +41,7 @@ import static com.oracle.adbaoverjdbc.ConnectionPropertiesJdbc.*;
  * <dd>a java.util.Properties passed as the info argument to getConnection</dd>
  * </dl>
  */
-class SessionBuilderJdbc implements jdk.incubator.sql2.Session.Builder {
+class SessionBuilderJdbc implements Session.Builder {
 
   /**
    *
@@ -74,7 +77,7 @@ class SessionBuilderJdbc implements jdk.incubator.sql2.Session.Builder {
   }
 
   @Override
-  public jdk.incubator.sql2.Session.Builder property(SessionProperty property, Object value) {
+  public Session.Builder property(SessionProperty property, Object value) {
     if (isBuilt) {
       throw new IllegalStateException("TODO");
     }
@@ -89,7 +92,7 @@ class SessionBuilderJdbc implements jdk.incubator.sql2.Session.Builder {
   }
 
   @Override
-  public jdk.incubator.sql2.Session build() {
+  public Session build() {
     if (isBuilt) {
       throw new IllegalStateException("TODO");
     }

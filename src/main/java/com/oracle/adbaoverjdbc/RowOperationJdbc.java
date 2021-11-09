@@ -15,11 +15,6 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import jdk.incubator.sql2.ParameterizedRowOperation;
-import jdk.incubator.sql2.SqlException;
-import jdk.incubator.sql2.SqlType;
-import jdk.incubator.sql2.Result;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +23,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
+
+import jdk.incubator.sql2.ParameterizedRowOperation;
+import jdk.incubator.sql2.Result;
+import jdk.incubator.sql2.SqlException;
+import jdk.incubator.sql2.SqlType;
 
 
 /**
@@ -38,7 +38,7 @@ import java.util.stream.Collector;
  * action into smaller tasks so as to avoid hogging a thread.
  */
 class RowOperationJdbc<T>  extends RowBaseOperation<T> 
-        implements jdk.incubator.sql2.ParameterizedRowOperation<T> {
+        implements ParameterizedRowOperation<T> {
 
   static final Collector DEFAULT_COLLECTOR = Collector.of(
           () -> null,
@@ -116,7 +116,7 @@ class RowOperationJdbc<T>  extends RowBaseOperation<T>
   
   private void handleRow() throws SQLException {
     checkCanceled();
-    try (com.oracle.adbaoverjdbc.Result.RowColumn row = com.oracle.adbaoverjdbc.Result.newRowColumn(this)) {
+    try (ResultJdbc.RowColumnJdbc row = ResultJdbc.newRowColumn(this)) {
       collector.accumulator().accept(accumulator, row);
     }
   }

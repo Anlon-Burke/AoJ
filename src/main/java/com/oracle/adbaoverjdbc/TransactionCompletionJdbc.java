@@ -15,10 +15,12 @@
  */
 package com.oracle.adbaoverjdbc;
 
+import jdk.incubator.sql2.TransactionCompletion;
+
 /**
  *
  */
-class TransactionCompletionJdbc implements jdk.incubator.sql2.TransactionCompletion {
+class TransactionCompletionJdbc implements TransactionCompletion {
 
   private boolean isRollbackOnly = false;
   private boolean isInFlight = true;

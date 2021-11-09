@@ -15,21 +15,23 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import jdk.incubator.sql2.AdbaType;
-import jdk.incubator.sql2.SqlException;
-import jdk.incubator.sql2.SqlType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
+import jdk.incubator.sql2.AdbaType;
+import jdk.incubator.sql2.ParameterizedOperation;
+import jdk.incubator.sql2.SqlException;
+import jdk.incubator.sql2.SqlType;
+
 /**
  *
  */
 public abstract class ParameterizedOperationJdbc<T> extends OperationJdbc<T>
-        implements jdk.incubator.sql2.ParameterizedOperation<T> {
-  
+        implements ParameterizedOperation<T> {
+
   protected final Map<String, ParameterValue> setParameters;
   protected CompletionStage futureParameters;
 

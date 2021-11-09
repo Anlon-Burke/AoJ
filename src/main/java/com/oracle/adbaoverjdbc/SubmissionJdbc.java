@@ -19,10 +19,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Supplier;
 
+import jdk.incubator.sql2.Submission;
+
 /**
  *
  */
-class SubmissionJdbc<T> implements jdk.incubator.sql2.Submission<T> {
+class SubmissionJdbc<T> implements Submission<T> {
 
   final private Supplier<Boolean> cancel;
   final private CompletionStage<T> stage;

@@ -15,16 +15,18 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import jdk.incubator.sql2.SessionProperty;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import jdk.incubator.sql2.DataSource;
+import jdk.incubator.sql2.SessionProperty;
 
 /**
  * Bare bones DataSource. No support for Session caching.
  *
  */
-class DataSourceJdbc implements jdk.incubator.sql2.DataSource {
+class DataSourceJdbc implements DataSource {
 
   static DataSourceJdbc newDataSource(Map<SessionProperty, Object> defaultSessionProperties,
           Map<SessionProperty, Object> requiredSessionProperties) {

@@ -15,12 +15,6 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import jdk.incubator.sql2.AdbaType;
-import jdk.incubator.sql2.Session.Lifecycle;
-import jdk.incubator.sql2.SqlException;
-import jdk.incubator.sql2.SqlSkippedException;
-import jdk.incubator.sql2.SqlType;
-import jdk.incubator.sql2.Submission;
 import java.math.BigInteger;
 import java.sql.JDBCType;
 import java.sql.SQLType;
@@ -38,6 +32,14 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
+import jdk.incubator.sql2.AdbaType;
+import jdk.incubator.sql2.Operation;
+import jdk.incubator.sql2.Session.Lifecycle;
+import jdk.incubator.sql2.SqlException;
+import jdk.incubator.sql2.SqlSkippedException;
+import jdk.incubator.sql2.SqlType;
+import jdk.incubator.sql2.Submission;
+
 /**
  * An Operation collects the various properties of the request for work, then
  * constructs one or more CompletionStages that will do the work of the
@@ -45,7 +47,7 @@ import java.util.function.Consumer;
  * CompletionStage of the preceeding Operation.
  *
  */
-abstract class OperationJdbc<T> implements jdk.incubator.sql2.Operation<T> {
+abstract class OperationJdbc<T> implements Operation<T> {
   
   private static final Map<Class, SQLType> CLASS_TO_JDBCTYPE = new HashMap<>(20);
   static {

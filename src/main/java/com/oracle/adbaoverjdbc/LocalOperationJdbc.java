@@ -21,11 +21,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import jdk.incubator.sql2.LocalOperation;
+import jdk.incubator.sql2.Session;
 import jdk.incubator.sql2.Session.Lifecycle;
 import jdk.incubator.sql2.Session.SessionLifecycleListener;
 
 class LocalOperationJdbc<T> extends SimpleOperation<T> 
-  implements jdk.incubator.sql2.LocalOperation<T> {
+  implements LocalOperation<T> {
 
   /** 
    * Describes the state of execute() in terms of whether its currently 
@@ -112,7 +114,7 @@ class LocalOperationJdbc<T> extends SimpleOperation<T>
   private void registerAbortListener() {
     assert abortListener == null;
     
-    abortListener = (jdk.incubator.sql2.Session session1, Lifecycle previous, Lifecycle current) -> {
+    abortListener = (Session session1, Lifecycle previous, Lifecycle current) -> {
         if (Lifecycle.ABORTING == current)
             interrupt();  
     };

@@ -15,8 +15,6 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import jdk.incubator.sql2.SqlException;
-import jdk.incubator.sql2.SqlType;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -28,8 +26,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import jdk.incubator.sql2.ParameterizedRowPublisherOperation;
 import jdk.incubator.sql2.Result;
+import jdk.incubator.sql2.SqlException;
+import jdk.incubator.sql2.SqlType;
 
 /**
  * Creates separate CompletionStages to execute the query, to fetch and process
@@ -39,7 +40,7 @@ import jdk.incubator.sql2.Result;
  * action into smaller tasks so as to avoid hogging a thread.
  */
 class RowPublisherOperationJdbc<T>  extends RowBaseOperation<T> 
-        implements jdk.incubator.sql2.ParameterizedRowPublisherOperation<T> {
+        implements ParameterizedRowPublisherOperation<T> {
   
   
   private static Logger logger = OperationGroupJdbc.NULL_LOGGER;
@@ -226,7 +227,7 @@ class RowPublisherOperationJdbc<T>  extends RowBaseOperation<T>
   
   private void handleRow() throws SQLException {
     checkCanceled();
-    try (com.oracle.adbaoverjdbc.Result.RowColumn row = com.oracle.adbaoverjdbc.Result.newRowColumn(this)) {
+    try (ResultJdbc.RowColumnJdbc row = ResultJdbc.newRowColumn(this)) {
       subscriber.onNext(row);
       demand.decrementAndGet();
     }

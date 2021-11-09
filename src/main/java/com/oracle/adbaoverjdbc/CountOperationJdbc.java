@@ -15,9 +15,6 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import jdk.incubator.sql2.RowOperation;
-import jdk.incubator.sql2.SqlException;
-import jdk.incubator.sql2.SqlType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,8 +25,12 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
+
 import jdk.incubator.sql2.ParameterizedRowCountOperation;
 import jdk.incubator.sql2.Result;
+import jdk.incubator.sql2.RowOperation;
+import jdk.incubator.sql2.SqlException;
+import jdk.incubator.sql2.SqlType;
 
 class CountOperationJdbc<T> extends ParameterizedOperationJdbc<T>
         implements ParameterizedRowCountOperation<T> {
@@ -117,7 +118,7 @@ class CountOperationJdbc<T> extends ParameterizedOperationJdbc<T>
         rowOperation.setResultSet(rs);
       }
       
-      return countProcessor.apply(com.oracle.adbaoverjdbc.Result.newRowCount(c));
+      return countProcessor.apply(ResultJdbc.newRowCount(c));
     }
     catch (SQLException ex) {
       throw new SqlException(ex.getMessage(), ex, ex.getSQLState(), ex.getErrorCode(), sqlString, -1);
@@ -184,7 +185,7 @@ class CountOperationJdbc<T> extends ParameterizedOperationJdbc<T>
    * underlying ResultSet is obtained during execution of the CountOperation.
    */
   private class GeneratedKeysRowOperation 
-    extends com.oracle.adbaoverjdbc.RowOperationJdbc<T> {
+    extends RowOperationJdbc<T> {
      
     private final CompletableFuture<T> resultCF;
  

@@ -15,7 +15,6 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import static com.oracle.adbaoverjdbc.OperationJdbc.toSQLType;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.time.Duration;
@@ -26,7 +25,9 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
+
 import jdk.incubator.sql2.AdbaType;
+import jdk.incubator.sql2.OutOperation;
 import jdk.incubator.sql2.Result;
 import jdk.incubator.sql2.SqlException;
 import jdk.incubator.sql2.SqlType;
@@ -36,7 +37,7 @@ import jdk.incubator.sql2.SqlType;
  * @param <T>
  */
 public class OutOperationJdbc<T> extends ParameterizedOperationJdbc<T> 
-        implements jdk.incubator.sql2.OutOperation<T> {
+        implements OutOperation<T> {
     
     /**
      * Factory method to create OutOperations.
@@ -137,7 +138,7 @@ public class OutOperationJdbc<T> extends ParameterizedOperationJdbc<T>
             
             group.logger.log(Level.FINE, () -> "execute(\"" + sqlString + "\")");
             jdbcCallableStmt.execute();
-            return processor.apply(com.oracle.adbaoverjdbc.Result.newOutColumn(this));
+            return processor.apply(ResultJdbc.newOutColumn(this));
         } 
         catch (SQLException ex) {
             throw new SqlException(ex.getMessage(), ex, ex.getSQLState(), ex.getErrorCode(), sqlString, -1);

@@ -17,6 +17,8 @@ package com.oracle.adbaoverjdbc;
 
 import java.util.Properties;
 
+import jdk.incubator.sql2.SessionProperty;
+
 /**
  * An ADBA SessionProperty that specifies a set of JDBC Connection properties.
  * Its value is a java.util.Properties. This value is passed as the info argument
@@ -41,7 +43,7 @@ import java.util.Properties;
  *  
  */
 public enum ConnectionPropertiesJdbc 
-  implements jdk.incubator.sql2.SessionProperty {
+  implements SessionProperty {
   
   /** 
    * A SessionProperty which specifies non-sensitive JDBC Connection 

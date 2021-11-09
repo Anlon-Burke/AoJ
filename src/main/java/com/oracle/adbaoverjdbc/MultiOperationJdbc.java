@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 
+import jdk.incubator.sql2.MultiOperation;
 import jdk.incubator.sql2.Operation;
 import jdk.incubator.sql2.Result.OutColumn;
 import jdk.incubator.sql2.RowCountOperation;
@@ -58,7 +59,7 @@ import jdk.incubator.sql2.Submission;
  * @param <T> The type of the result of this {@link Operation}
  */
 class MultiOperationJdbc<T> extends OutOperationJdbc<T>
-                               implements jdk.incubator.sql2.MultiOperation<T> {
+                               implements MultiOperation<T> {
 
   private static final int NOT_SET = -1;
   
@@ -353,7 +354,7 @@ class MultiOperationJdbc<T> extends OutOperationJdbc<T>
           jdbcStatement.close();
       
       return  (T)((processor != null) 
-                  ? processor.apply(com.oracle.adbaoverjdbc.Result.newOutColumn(this))
+                  ? processor.apply(ResultJdbc.newOutColumn(this))
                   : null);
     }
     catch (SQLException ex) {
@@ -408,7 +409,7 @@ class MultiOperationJdbc<T> extends OutOperationJdbc<T>
   }
 
   @Override
-  public jdk.incubator.sql2.MultiOperation<T> onCount(
+  public MultiOperation<T> onCount(
       BiConsumer<Integer, RowCountOperation<T>> handler) {
     if (isImmutable() || countHandler != DEFAULT_COUNT_HANDLER) throw new IllegalStateException("TODO");
     if (handler == null) throw new IllegalArgumentException("TODO");
@@ -419,7 +420,7 @@ class MultiOperationJdbc<T> extends OutOperationJdbc<T>
   }
 
   @Override
-  public jdk.incubator.sql2.MultiOperation<T> onError(BiConsumer<Integer, Throwable> handler) {
+  public MultiOperation<T> onError(BiConsumer<Integer, Throwable> handler) {
     if (isImmutable() || errorHandler != DEFAULT_ERROR_HANDLER) throw new IllegalStateException("TODO");
     if (handler == null) throw new IllegalArgumentException("TODO");
     if (super.errorHandler != null) throw new IllegalStateException("TODO");
@@ -430,7 +431,7 @@ class MultiOperationJdbc<T> extends OutOperationJdbc<T>
   }
 
   @Override
-  public jdk.incubator.sql2.MultiOperation<T> onRows(
+  public MultiOperation<T> onRows(
       BiConsumer<Integer, RowOperation<T>> handler) {
     if (isImmutable() || rowsHandler != DEFAULT_ROWS_HANDLER) throw new IllegalStateException("TODO");
     if (handler == null) throw new IllegalArgumentException("TODO");
@@ -630,7 +631,7 @@ class MultiOperationJdbc<T> extends OutOperationJdbc<T>
    *
    * @param <T>
    */
-   class MultiRowOperation<T> extends com.oracle.adbaoverjdbc.RowOperationJdbc<T>
+   class MultiRowOperation<T> extends RowOperationJdbc<T>
                               implements ChildRowOperation<T> {
     private CompletableFuture<T> resultCF;
     private long rowCount;
@@ -776,7 +777,7 @@ class MultiOperationJdbc<T> extends OutOperationJdbc<T>
     *
     * @param <T>
     */
-    class MultiRowPublisherOperation<T> extends com.oracle.adbaoverjdbc.RowPublisherOperationJdbc<T>
+    class MultiRowPublisherOperation<T> extends RowPublisherOperationJdbc<T>
                                         implements ChildRowOperation<T> {
      private CompletableFuture<T> resultCF;
      private long rowCount;
@@ -885,7 +886,7 @@ class MultiOperationJdbc<T> extends OutOperationJdbc<T>
     *
     * @param <T>
     */
-   class MultiOperationChildSubmission<T> implements jdk.incubator.sql2.Submission<T> {
+   class MultiOperationChildSubmission<T> implements Submission<T> {
      
      Submission<T>  submission;
      CompletionStage<T> childOpCompletetionStage;
