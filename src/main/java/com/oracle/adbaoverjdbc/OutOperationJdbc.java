@@ -138,7 +138,7 @@ public class OutOperationJdbc<T> extends ParameterizedOperationJdbc<T>
             
             group.logger.log(Level.FINE, () -> "execute(\"" + sqlString + "\")");
             jdbcCallableStmt.execute();
-            return processor.apply(ResultJdbc.newOutColumn(this));
+            return processor.apply(ResultImpl.newOutColumn(this));
         } 
         catch (SQLException ex) {
             throw new SqlException(ex.getMessage(), ex, ex.getSQLState(), ex.getErrorCode(), sqlString, -1);

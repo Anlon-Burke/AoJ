@@ -94,7 +94,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
         "Session lifecycle is: " + getSessionLifecycle());
     }
     return addMember(
-      SimpleOperation.<Void>newOperation(
+      SimpleOperationImpl.<Void>newOperation(
         this, this, this::jdbcConnect));
   }
 
@@ -102,7 +102,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   public Operation<Void> validationOperation(Validation depth) {
     assertOpen();
     return addMember(
-      SimpleOperation.<Void>newOperation(
+      SimpleOperationImpl.<Void>newOperation(
         this, this, op -> jdbcValidate(op, depth)));
   }
 
@@ -110,7 +110,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
   public Operation<Void> closeOperation() {
     assertOpen();
     return addMember(
-      UnskippableOperation.<Void>newOperation(
+      UnskippableOperationImpl.<Void>newOperation(
         this, this, this::jdbcClose));  //TODO cannot be skipped
   }
 
@@ -363,7 +363,7 @@ class SessionJdbc extends OperationGroupJdbc<Object, Object> implements Session 
     return jdbcConnection.prepareStatement(sqlString, auotKeyColNames);
   }
   
-  TransactionOutcome jdbcEndTransaction(SimpleOperation<TransactionOutcome> op, TransactionCompletionJdbc trans) {
+  TransactionOutcome jdbcEndTransaction(SimpleOperationImpl<TransactionOutcome> op, TransactionCompletionJdbc trans) {
     try {
       if (trans.endWithCommit(this)) {
         group.logger.log(Level.FINE, () -> "commit"); //DEBUG

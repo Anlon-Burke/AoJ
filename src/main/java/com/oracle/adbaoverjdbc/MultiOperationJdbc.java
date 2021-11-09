@@ -354,7 +354,7 @@ class MultiOperationJdbc<T> extends OutOperationJdbc<T>
           jdbcStatement.close();
       
       return  (T)((processor != null) 
-                  ? processor.apply(ResultJdbc.newOutColumn(this))
+                  ? processor.apply(ResultImpl.newOutColumn(this))
                   : null);
     }
     catch (SQLException ex) {

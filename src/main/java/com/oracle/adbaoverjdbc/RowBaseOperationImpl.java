@@ -31,7 +31,7 @@ import jdk.incubator.sql2.SqlException;
  *
  * @param <T>
  */
-public abstract class RowBaseOperation<T> extends ParameterizedOperationJdbc<T> {
+public abstract class RowBaseOperationImpl<T> extends ParameterizedOperationJdbc<T> {
   
   // attributes
   protected final String sqlString;
@@ -48,7 +48,7 @@ public abstract class RowBaseOperation<T> extends ParameterizedOperationJdbc<T> 
   
   protected static final int NOT_SET = -1;
   
-  RowBaseOperation(SessionJdbc session, OperationGroupJdbc operationGroup, String sql) {
+  RowBaseOperationImpl(SessionJdbc session, OperationGroupJdbc operationGroup, String sql) {
     super(session, operationGroup);
     sqlString = sql;
     fetchSize = NOT_SET;

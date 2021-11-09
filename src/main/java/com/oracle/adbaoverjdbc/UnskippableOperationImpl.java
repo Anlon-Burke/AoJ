@@ -22,18 +22,18 @@ import java.util.function.Function;
 /**
  *
  */
-class UnskippableOperation<T> extends SimpleOperation<T> {
+class UnskippableOperationImpl<T> extends SimpleOperationImpl<T> {
   
-  static <S> UnskippableOperation<S> newOperation(SessionJdbc session,
+  static <S> UnskippableOperationImpl<S> newOperation(SessionJdbc session,
                                              OperationGroupJdbc<? super S, ?> group,
-                                             Function<SimpleOperation<S>, S> action) {
-    return new UnskippableOperation<>(session, group, action);
+                                             Function<SimpleOperationImpl<S>, S> action) {
+    return new UnskippableOperationImpl<>(session, group, action);
   }
 
-  protected UnskippableOperation(SessionJdbc session,
+  protected UnskippableOperationImpl(SessionJdbc session,
                             OperationGroupJdbc<? super T, ?> operationGroup,
-                            Function<SimpleOperation<T>, T> action) {
-    super(session, operationGroup, (Function<SimpleOperation<T>, T>)action);
+                            Function<SimpleOperationImpl<T>, T> action) {
+    super(session, operationGroup, (Function<SimpleOperationImpl<T>, T>)action);
   }
 
   @Override

@@ -24,19 +24,19 @@ import java.util.function.Supplier;
  *
  * @param <T>
  */
-class SimpleOperation<T> extends OperationJdbc<T> implements Supplier<T> {
+class SimpleOperationImpl<T> extends OperationJdbc<T> implements Supplier<T> {
 
-  static <S> SimpleOperation<S> newOperation(SessionJdbc session,
+  static <S> SimpleOperationImpl<S> newOperation(SessionJdbc session,
                                              OperationGroupJdbc<? super S, ?> group,
-                                             Function<SimpleOperation<S>, S> act) {
-    return new SimpleOperation<>(session, group, act);
+                                             Function<SimpleOperationImpl<S>, S> act) {
+    return new SimpleOperationImpl<>(session, group, act);
   }
 
-  private final Function<SimpleOperation<T>, T> action;
+  private final Function<SimpleOperationImpl<T>, T> action;
 
-  protected SimpleOperation(SessionJdbc session,
+  protected SimpleOperationImpl(SessionJdbc session,
                             OperationGroupJdbc<? super T, ?> operationGroup,
-                            Function<SimpleOperation<T>, T> act) {
+                            Function<SimpleOperationImpl<T>, T> act) {
     super(session, operationGroup);
     action = act;
   }

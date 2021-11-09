@@ -135,7 +135,7 @@ class ArrayCountOperationJdbc<T> extends ParameterizedOperationJdbc<T>
       // Get final count using the collector
       Object container = countCollector.supplier().get();
       for (long c : counts)
-         countCollector.accumulator().accept(container, ResultJdbc.newRowCount(c));
+         countCollector.accumulator().accept(container, ResultImpl.newRowCount(c));
      return countCollector.finisher().apply(container);
     }
     catch (SQLException ex) {

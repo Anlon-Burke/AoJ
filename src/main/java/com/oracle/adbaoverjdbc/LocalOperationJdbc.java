@@ -26,7 +26,7 @@ import jdk.incubator.sql2.Session;
 import jdk.incubator.sql2.Session.Lifecycle;
 import jdk.incubator.sql2.Session.SessionLifecycleListener;
 
-class LocalOperationJdbc<T> extends SimpleOperation<T> 
+class LocalOperationJdbc<T> extends SimpleOperationImpl<T> 
   implements LocalOperation<T> {
 
   /** 

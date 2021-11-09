@@ -39,7 +39,7 @@ import jdk.incubator.sql2.SqlType;
  * separate CompletionStages. This class does so to break up this large synchronous
  * action into smaller tasks so as to avoid hogging a thread.
  */
-class RowPublisherOperationJdbc<T>  extends RowBaseOperation<T> 
+class RowPublisherOperationJdbc<T>  extends RowBaseOperationImpl<T> 
         implements ParameterizedRowPublisherOperation<T> {
   
   
@@ -227,7 +227,7 @@ class RowPublisherOperationJdbc<T>  extends RowBaseOperation<T>
   
   private void handleRow() throws SQLException {
     checkCanceled();
-    try (ResultJdbc.RowColumnJdbc row = ResultJdbc.newRowColumn(this)) {
+    try (ResultImpl.RowColumnJdbc row = ResultImpl.newRowColumn(this)) {
       subscriber.onNext(row);
       demand.decrementAndGet();
     }

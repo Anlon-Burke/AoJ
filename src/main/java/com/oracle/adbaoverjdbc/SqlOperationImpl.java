@@ -18,13 +18,13 @@ package com.oracle.adbaoverjdbc;
 /**
  *
  */
-class SqlOperation<T> extends SimpleOperation<T> {
+class SqlOperationImpl<T> extends SimpleOperationImpl<T> {
   
-  static <S> SqlOperation<S> newOperation(SessionJdbc session, OperationGroupJdbc<? super S, ?> group, String sql) {
-    return new SqlOperation<>(session, group, sql);
+  static <S> SqlOperationImpl<S> newOperation(SessionJdbc session, OperationGroupJdbc<? super S, ?> group, String sql) {
+    return new SqlOperationImpl<>(session, group, sql);
   } 
   
-  protected SqlOperation(SessionJdbc session, OperationGroupJdbc<? super T, ?> group, String sql) {
+  protected SqlOperationImpl(SessionJdbc session, OperationGroupJdbc<? super T, ?> group, String sql) {
     super(session, group, op -> (T)session.jdbcExecute(op, sql));
   }
 }

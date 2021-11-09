@@ -118,7 +118,7 @@ class CountOperationJdbc<T> extends ParameterizedOperationJdbc<T>
         rowOperation.setResultSet(rs);
       }
       
-      return countProcessor.apply(ResultJdbc.newRowCount(c));
+      return countProcessor.apply(ResultImpl.newRowCount(c));
     }
     catch (SQLException ex) {
       throw new SqlException(ex.getMessage(), ex, ex.getSQLState(), ex.getErrorCode(), sqlString, -1);

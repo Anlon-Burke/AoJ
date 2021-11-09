@@ -204,7 +204,7 @@ class OperationGroupJdbc<S, T> extends OperationJdbc<T>
   @Override
   public OperationJdbc<S> catchOperation() {
     assertOpen();
-    return addMember(UnskippableOperation.newOperation(session, this, 
+    return addMember(UnskippableOperationImpl.newOperation(session, this, 
                                                        op -> null));
   }
 
@@ -224,10 +224,10 @@ class OperationGroupJdbc<S, T> extends OperationJdbc<T>
  }
 
   @Override
-  public SqlOperation<S> operation(String sql) {
+  public SqlOperationImpl<S> operation(String sql) {
     assertOpen();
     if (sql == null) throw new IllegalArgumentException("Null argument.");
-    return addMember(SqlOperation.newOperation(session, this, sql));
+    return addMember(SqlOperationImpl.newOperation(session, this, sql));
   }
 
   @Override
@@ -260,11 +260,11 @@ class OperationGroupJdbc<S, T> extends OperationJdbc<T>
   }
 
   @Override
-  public SimpleOperation<TransactionOutcome> endTransactionOperation(TransactionCompletion trans) {
+  public SimpleOperationImpl<TransactionOutcome> endTransactionOperation(TransactionCompletion trans) {
     assertOpen();
     // TODO If member type S != TransactionOutcome ???
-    SimpleOperation<TransactionOutcome> newOp = 
-      SimpleOperation.<TransactionOutcome>newOperation(session, 
+    SimpleOperationImpl<TransactionOutcome> newOp = 
+      SimpleOperationImpl.<TransactionOutcome>newOperation(session, 
         (OperationGroupJdbc<Object,T>)this, 
         op -> session.jdbcEndTransaction(op, 
                         (TransactionCompletionJdbc)trans)

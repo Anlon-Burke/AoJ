@@ -27,19 +27,19 @@ import jdk.incubator.sql2.SqlType;
  * Result of the given database operation.
  */
 
-abstract class ResultJdbc {
+abstract class ResultImpl {
     
     static Result.RowCount newRowCount(long c) {
-        return new ResultJdbc.RowCountJdbc(c);
+        return new ResultImpl.RowCountJdbc(c);
     }
     
-    static ResultJdbc.RowColumnJdbc newRowColumn(RowBaseOperation op) {
-        return new ResultJdbc.RowColumnJdbc(op);
+    static ResultImpl.RowColumnJdbc newRowColumn(RowBaseOperationImpl op) {
+        return new ResultImpl.RowColumnJdbc(op);
     }
     
     static Result.OutColumn newOutColumn(OutOperationJdbc op) {
       try {
-        return new ResultJdbc.OutColumnJdbc(op, 
+        return new ResultImpl.OutColumnJdbc(op, 
                                     op.jdbcCallableStmt()
                                       .getParameterMetaData()
                                       .getParameterCount());
@@ -253,10 +253,10 @@ abstract class ResultJdbc {
       }
 
       @Override
-      public ResultJdbc.ColumnJdbc clone() {
+      public ResultImpl.ColumnJdbc clone() {
         assertOpen();
         try {
-          return (ResultJdbc.ColumnJdbc) super.clone();
+          return (ResultImpl.ColumnJdbc) super.clone();
         } catch (CloneNotSupportedException ex) {
           throw new RuntimeException("TODO", ex);
         }
@@ -310,9 +310,9 @@ abstract class ResultJdbc {
     static final class RowColumnJdbc extends ColumnJdbc 
       implements Result.RowColumn {
         
-      private final RowBaseOperation rowOp;
+      private final RowBaseOperationImpl rowOp;
       
-      RowColumnJdbc(RowBaseOperation op) {
+      RowColumnJdbc(RowBaseOperationImpl op) {
         super(op.getIdentifiers().length);
         rowOp = op;
       }
