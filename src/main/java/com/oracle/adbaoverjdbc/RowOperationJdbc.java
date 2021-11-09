@@ -37,7 +37,7 @@ import java.util.stream.Collector;
  * separate CompletionStages. This class does so to break up this large synchronous
  * action into smaller tasks so as to avoid hogging a thread.
  */
-class RowOperation<T>  extends RowBaseOperation<T> 
+class RowOperationJdbc<T>  extends RowBaseOperation<T> 
         implements jdk.incubator.sql2.ParameterizedRowOperation<T> {
 
   static final Collector DEFAULT_COLLECTOR = Collector.of(
@@ -45,8 +45,8 @@ class RowOperation<T>  extends RowBaseOperation<T>
           (a, v) -> {},
           (a, b) -> null,
           a -> null);
-  static <S> RowOperation<S> newRowOperation(Session session, OperationGroup grp, String sql) {
-    return new RowOperation<>(session, grp, sql);
+  static <S> RowOperationJdbc<S> newRowOperation(SessionJdbc session, OperationGroupJdbc grp, String sql) {
+    return new RowOperationJdbc<>(session, grp, sql);
   }
   
   // attributes
@@ -55,7 +55,7 @@ class RowOperation<T>  extends RowBaseOperation<T>
   // internal state
   private Object accumulator;
   
-  protected RowOperation(Session session, OperationGroup grp, String sql) {
+  protected RowOperationJdbc(SessionJdbc session, OperationGroupJdbc grp, String sql) {
     super(session, grp, sql);
     collector = DEFAULT_COLLECTOR;
   }
@@ -143,32 +143,32 @@ class RowOperation<T>  extends RowBaseOperation<T>
   }
 
   @Override
-  public RowOperation<T> onError(Consumer<Throwable> handler) {
-    return (RowOperation<T>)super.onError(handler);
+  public RowOperationJdbc<T> onError(Consumer<Throwable> handler) {
+    return (RowOperationJdbc<T>)super.onError(handler);
   }
 
   @Override
-  public RowOperation<T> timeout(Duration minTime) {
-    return (RowOperation<T>)super.timeout(minTime);
+  public RowOperationJdbc<T> timeout(Duration minTime) {
+    return (RowOperationJdbc<T>)super.timeout(minTime);
   }
 
   @Override
-  public RowOperation<T> set(String id, Object value, SqlType type) {
-    return (RowOperation<T>)super.set(id, value, type);
+  public RowOperationJdbc<T> set(String id, Object value, SqlType type) {
+    return (RowOperationJdbc<T>)super.set(id, value, type);
   }
 
   @Override
-  public RowOperation<T> set(String id, CompletionStage<?> source, SqlType type) {
-    return (RowOperation<T>)super.set(id, source, type);
+  public RowOperationJdbc<T> set(String id, CompletionStage<?> source, SqlType type) {
+    return (RowOperationJdbc<T>)super.set(id, source, type);
   }
 
   @Override
-  public RowOperation<T> set(String id, CompletionStage<?> source) {
-    return (RowOperation<T>)super.set(id, source);
+  public RowOperationJdbc<T> set(String id, CompletionStage<?> source) {
+    return (RowOperationJdbc<T>)super.set(id, source);
   }
 
   @Override
-  public RowOperation<T> set(String id, Object value) {
-    return (RowOperation<T>)super.set(id, value);
+  public RowOperationJdbc<T> set(String id, Object value) {
+    return (RowOperationJdbc<T>)super.set(id, value);
   }
 }

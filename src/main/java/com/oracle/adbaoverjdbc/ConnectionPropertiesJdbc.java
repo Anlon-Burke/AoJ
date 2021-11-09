@@ -36,11 +36,11 @@ import java.util.Properties;
  * </ul>
  * If values for both JdbcSessionProperties have been specified for a session, 
  * and both values specify the same JDBC property, this is an illegal 
- * specification. Attempting to create a {@link Session} with this 
+ * specification. Attempting to create a {@link SessionJdbc} with this 
  * configuration will result in an {@link IllegalArgumentException}.   
  *  
  */
-public enum JdbcConnectionProperties 
+public enum ConnectionPropertiesJdbc 
   implements jdk.incubator.sql2.SessionProperty {
   
   /** 
@@ -57,7 +57,7 @@ public enum JdbcConnectionProperties
   
   private final boolean sensitive;
   
-  private JdbcConnectionProperties(boolean sensitive) {
+  private ConnectionPropertiesJdbc(boolean sensitive) {
     this.sensitive = sensitive;
   }
 

@@ -20,11 +20,11 @@ import jdk.incubator.sql2.DataSource;
 /**
  *
  */
-public class DataSourceFactory implements jdk.incubator.sql2.DataSourceFactory {
+public class DataSourceFactoryJdbc implements jdk.incubator.sql2.DataSourceFactory {
 
   @Override
   public DataSource.Builder builder() {
-    return DataSourceBuilder.newDataSourceBuilder();
+    return DataSourceBuilderJdbc.newDataSourceBuilder();
   }
 
 }

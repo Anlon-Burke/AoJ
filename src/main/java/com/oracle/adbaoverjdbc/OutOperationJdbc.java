@@ -15,7 +15,7 @@
  */
 package com.oracle.adbaoverjdbc;
 
-import static com.oracle.adbaoverjdbc.Operation.toSQLType;
+import static com.oracle.adbaoverjdbc.OperationJdbc.toSQLType;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.time.Duration;
@@ -35,7 +35,7 @@ import jdk.incubator.sql2.SqlType;
  *
  * @param <T>
  */
-public class OutOperation<T> extends ParameterizedOperation<T> 
+public class OutOperationJdbc<T> extends ParameterizedOperationJdbc<T> 
         implements jdk.incubator.sql2.OutOperation<T> {
     
     /**
@@ -47,8 +47,8 @@ public class OutOperation<T> extends ParameterizedOperation<T>
      * @param sql the SQL string to execute.
      * @return a new OutOperation that will execute sql.
      */
-    static <S> OutOperation<S> newOutOperation(Session session, OperationGroup grp, String sql) {
-        return new OutOperation<>(session, grp, sql);
+    static <S> OutOperationJdbc<S> newOutOperation(SessionJdbc session, OperationGroupJdbc grp, String sql) {
+        return new OutOperationJdbc<>(session, grp, sql);
     }
     
     // attributes
@@ -57,13 +57,13 @@ public class OutOperation<T> extends ParameterizedOperation<T>
     protected Function<Result.OutColumn, ? extends T> processor = null;
     private CallableStatement jdbcCallableStmt;
     
-    OutOperation(Session session, OperationGroup operationGroup, String sql) {
+    OutOperationJdbc(SessionJdbc session, OperationGroupJdbc operationGroup, String sql) {
         super(session, operationGroup);
         sqlString = sql;
     }
 
     @Override
-    public OutOperation<T> outParameter(String id, SqlType type) {
+    public OutOperationJdbc<T> outParameter(String id, SqlType type) {
         if (isImmutable() || outParameters.containsKey(id)) {
             throw new IllegalStateException("TODO");
         }
@@ -72,39 +72,39 @@ public class OutOperation<T> extends ParameterizedOperation<T>
     }
 
     @Override
-    public OutOperation<T> apply(Function<Result.OutColumn, ? extends T> processor) {
+    public OutOperationJdbc<T> apply(Function<Result.OutColumn, ? extends T> processor) {
         this.processor = processor;
         return this;
     }
 
     @Override
-    public OutOperation<T> onError(Consumer<Throwable> handler) {
-        return (OutOperation<T>)super.onError(handler);
+    public OutOperationJdbc<T> onError(Consumer<Throwable> handler) {
+        return (OutOperationJdbc<T>)super.onError(handler);
     }
 
     @Override
-    public OutOperation<T> set(String id, Object value) {
-        return (OutOperation<T>)super.set(id, value);
+    public OutOperationJdbc<T> set(String id, Object value) {
+        return (OutOperationJdbc<T>)super.set(id, value);
     }
 
     @Override
-    public OutOperation<T> set(String id, Object value, SqlType type) {
-        return (OutOperation<T>)super.set(id, value, type);
+    public OutOperationJdbc<T> set(String id, Object value, SqlType type) {
+        return (OutOperationJdbc<T>)super.set(id, value, type);
     }
 
     @Override
-    public OutOperation<T> set(String id, CompletionStage<?> source) {
-        return (OutOperation<T>)super.set(id, source);
+    public OutOperationJdbc<T> set(String id, CompletionStage<?> source) {
+        return (OutOperationJdbc<T>)super.set(id, source);
     }
 
     @Override
-    public OutOperation<T> set(String id, CompletionStage<?> source, SqlType type) {
-        return (OutOperation<T>)super.set(id, source, type);
+    public OutOperationJdbc<T> set(String id, CompletionStage<?> source, SqlType type) {
+        return (OutOperationJdbc<T>)super.set(id, source, type);
     }
 
     @Override
-    public OutOperation<T> timeout(Duration minTime) {
-        return (OutOperation<T>)super.timeout(minTime);
+    public OutOperationJdbc<T> timeout(Duration minTime) {
+        return (OutOperationJdbc<T>)super.timeout(minTime);
     }
 
     @Override

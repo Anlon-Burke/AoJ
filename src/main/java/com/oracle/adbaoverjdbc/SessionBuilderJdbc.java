@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.oracle.adbaoverjdbc.JdbcConnectionProperties.*;
+import static com.oracle.adbaoverjdbc.ConnectionPropertiesJdbc.*;
 
 /**
  * A builder to create an AoJ session. The AoJ session creates a JDBC
@@ -38,7 +38,7 @@ import static com.oracle.adbaoverjdbc.JdbcConnectionProperties.*;
  * <dd>a java.util.Properties passed as the info argument to getConnection</dd>
  * </dl>
  */
-class SessionBuilder implements jdk.incubator.sql2.Session.Builder {
+class SessionBuilderJdbc implements jdk.incubator.sql2.Session.Builder {
 
   /**
    *
@@ -47,14 +47,14 @@ class SessionBuilder implements jdk.incubator.sql2.Session.Builder {
    * @param requiredProperties. Captured
    * @return
    */
-  static SessionBuilder newSessionBuilder(DataSource ds, 
+  static SessionBuilderJdbc newSessionBuilder(DataSourceJdbc ds, 
           Map<SessionProperty, Object> defaultProperties,
           Map<SessionProperty, Object> requiredProperties) {
-    return new SessionBuilder(ds, defaultProperties, requiredProperties);
+    return new SessionBuilderJdbc(ds, defaultProperties, requiredProperties);
   }
 
   private boolean isBuilt = false;
-  private final DataSource dataSource;
+  private final DataSourceJdbc dataSource;
   private final Map<SessionProperty, Object> defaultProperties;
   private final Map<SessionProperty, Object> requiredProperties;
 
@@ -64,7 +64,7 @@ class SessionBuilder implements jdk.incubator.sql2.Session.Builder {
    * @param defaultSessionProperties
    * @param specifiedSessionProperties 
    */
-  private SessionBuilder(DataSource ds,
+  private SessionBuilderJdbc(DataSourceJdbc ds,
           Map<SessionProperty, Object> defaultSessionProperties,
           Map<SessionProperty, Object> specifiedSessionProperties) {
     super();
@@ -98,7 +98,7 @@ class SessionBuilder implements jdk.incubator.sql2.Session.Builder {
     // otherwise use defaults
     defaultProperties.putAll(requiredProperties);
     validateProperties(defaultProperties);
-    return Session.newSession(dataSource, defaultProperties);
+    return SessionJdbc.newSession(dataSource, defaultProperties);
   }
   
   /**

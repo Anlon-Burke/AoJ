@@ -43,12 +43,12 @@ import jdk.incubator.sql2.Submission;
  * addition to the out result defined by the {@link Operation}. Each result is
  * processed by an {@link Operation}. The {@link Operation}s can be created by
  * calling
- * {@link MultiOperation#rowOperation}, {@link MultiOperation#rowProcessorOperation},
- * or {@link MultiOperation#rowCountOperation} if the kind of results is known.
+ * {@link MultiOperationJdbc#rowOperation}, {@link MultiOperationJdbc#rowProcessorOperation},
+ * or {@link MultiOperationJdbc#rowCountOperation} if the kind of results is known.
  * These results are processed in the order the {@link Operation}s are
  * submitted. Any results not processed by an explicit {@link Operation} is
  * processed by calling the appropriate handler specified by
- * {@link MultiOperation#onRows} or {@link MultiOperation#onCount}. If any
+ * {@link MultiOperationJdbc#onRows} or {@link MultiOperationJdbc#onCount}. If any
  * result is an error that error is processed by calling the handler specified
  * by {@link Operation#onError} of the corresponding {@link Operation}. If the
  * appropriate handler is not specified that result is ignored, including
@@ -57,7 +57,7 @@ import jdk.incubator.sql2.Submission;
  *
  * @param <T> The type of the result of this {@link Operation}
  */
-class MultiOperation<T> extends OutOperation<T>
+class MultiOperationJdbc<T> extends OutOperationJdbc<T>
                                implements jdk.incubator.sql2.MultiOperation<T> {
 
   private static final int NOT_SET = -1;
@@ -96,11 +96,11 @@ class MultiOperation<T> extends OutOperation<T>
   
   
   // Factory method
-  static <S> MultiOperation<S> newMultiOperation(Session session, OperationGroup grp, String sql) {
-    return new MultiOperation<>(session, grp, sql);
+  static <S> MultiOperationJdbc<S> newMultiOperation(SessionJdbc session, OperationGroupJdbc grp, String sql) {
+    return new MultiOperationJdbc<>(session, grp, sql);
   }
   
-  protected MultiOperation(Session session, OperationGroup grp, String sql) {
+  protected MultiOperationJdbc(SessionJdbc session, OperationGroupJdbc grp, String sql) {
     super(session, grp,null);
     fetchSize = NOT_SET;
     countHandler = DEFAULT_COUNT_HANDLER;
@@ -369,40 +369,40 @@ class MultiOperation<T> extends OutOperation<T>
   }
   
   @Override
-  public MultiOperation<T> onError(Consumer<Throwable> handler) {
+  public MultiOperationJdbc<T> onError(Consumer<Throwable> handler) {
     if (this.errorHandler != null) 
       throw new IllegalStateException("TODO");
       
-    return (MultiOperation<T>)super.onError(handler);
+    return (MultiOperationJdbc<T>)super.onError(handler);
   }
 
   @Override
-  public MultiOperation<T> timeout(Duration minTime) {
-    return (MultiOperation<T>)super.timeout(minTime);
+  public MultiOperationJdbc<T> timeout(Duration minTime) {
+    return (MultiOperationJdbc<T>)super.timeout(minTime);
   }
 
   @Override
-  public MultiOperation<T> set(String id, Object value, SqlType type) {
-    return (MultiOperation<T>)super.set(id, value, type);
+  public MultiOperationJdbc<T> set(String id, Object value, SqlType type) {
+    return (MultiOperationJdbc<T>)super.set(id, value, type);
   }
 
   @Override
-  public MultiOperation<T> set(String id, CompletionStage<?> source, SqlType type) {
-    return (MultiOperation<T>)super.set(id, source, type);
+  public MultiOperationJdbc<T> set(String id, CompletionStage<?> source, SqlType type) {
+    return (MultiOperationJdbc<T>)super.set(id, source, type);
   }
 
   @Override
-  public MultiOperation<T> set(String id, CompletionStage<?> source) {
-    return (MultiOperation<T>)super.set(id, source);
+  public MultiOperationJdbc<T> set(String id, CompletionStage<?> source) {
+    return (MultiOperationJdbc<T>)super.set(id, source);
   }
 
   @Override
-  public MultiOperation<T> set(String id, Object value) {
-    return (MultiOperation<T>)super.set(id, value);
+  public MultiOperationJdbc<T> set(String id, Object value) {
+    return (MultiOperationJdbc<T>)super.set(id, value);
   }
 
   @Override
-  public MultiOperation<T> apply(Function<OutColumn, ? extends T> processor) {
+  public MultiOperationJdbc<T> apply(Function<OutColumn, ? extends T> processor) {
     super.apply(processor);
     return this;
   }
@@ -441,7 +441,7 @@ class MultiOperation<T> extends OutOperation<T>
   }
 
   @Override
-  public MultiOperation<T> outParameter(String id, SqlType type) {
+  public MultiOperationJdbc<T> outParameter(String id, SqlType type) {
     super.outParameter(id, type);
     return this;
   }
@@ -509,7 +509,7 @@ class MultiOperation<T> extends OutOperation<T>
    *
    * @param <T>
    */
-  class MultiRowCountOperation<T> extends CountOperation<T> 
+  class MultiRowCountOperation<T> extends CountOperationJdbc<T> 
                                   implements ChildRowCountOperation<T> {
     private CompletableFuture<T> resultCF;
     private long rowCount;
@@ -517,7 +517,7 @@ class MultiOperation<T> extends OutOperation<T>
     private CompletionStage<T> opCompletetionStage;
     
     
-    MultiRowCountOperation(Session session, OperationGroup operationGroup, boolean countHandler) {
+    MultiRowCountOperation(SessionJdbc session, OperationGroupJdbc operationGroup, boolean countHandler) {
       super(session, operationGroup, null);
       resultCF = new CompletableFuture<T>();
       rowCount = -1;
@@ -630,7 +630,7 @@ class MultiOperation<T> extends OutOperation<T>
    *
    * @param <T>
    */
-   class MultiRowOperation<T> extends com.oracle.adbaoverjdbc.RowOperation<T>
+   class MultiRowOperation<T> extends com.oracle.adbaoverjdbc.RowOperationJdbc<T>
                               implements ChildRowOperation<T> {
     private CompletableFuture<T> resultCF;
     private long rowCount;
@@ -638,7 +638,7 @@ class MultiOperation<T> extends OutOperation<T>
     private CompletionStage<T> opCompletetionStage;
     private ResultSet rowsHandlerResultSet;    
     
-    MultiRowOperation(Session session, OperationGroup operationGroup, boolean rowsHandler) {
+    MultiRowOperation(SessionJdbc session, OperationGroupJdbc operationGroup, boolean rowsHandler) {
       super(session, operationGroup, null);
       resultCF = new CompletableFuture<T>();
       rowCount = -1;
@@ -776,13 +776,13 @@ class MultiOperation<T> extends OutOperation<T>
     *
     * @param <T>
     */
-    class MultiRowPublisherOperation<T> extends com.oracle.adbaoverjdbc.RowPublisherOperation<T>
+    class MultiRowPublisherOperation<T> extends com.oracle.adbaoverjdbc.RowPublisherOperationJdbc<T>
                                         implements ChildRowOperation<T> {
      private CompletableFuture<T> resultCF;
      private long rowCount;
      private CompletionStage<T> opCompletetionStage;
      
-     MultiRowPublisherOperation(Session session, OperationGroup operationGroup) {
+     MultiRowPublisherOperation(SessionJdbc session, OperationGroupJdbc operationGroup) {
        super(session, operationGroup, null);
        resultCF = new CompletableFuture<T>();
        rowCount = -1;

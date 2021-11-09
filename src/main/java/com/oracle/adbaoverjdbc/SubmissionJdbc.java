@@ -22,17 +22,17 @@ import java.util.function.Supplier;
 /**
  *
  */
-class Submission<T> implements jdk.incubator.sql2.Submission<T> {
+class SubmissionJdbc<T> implements jdk.incubator.sql2.Submission<T> {
 
   final private Supplier<Boolean> cancel;
   final private CompletionStage<T> stage;
   private CompletionStage<T> publicStage;
   
-  static <T> Submission<T> submit(Supplier<Boolean> cancel, CompletionStage<T> s) {
-    return new Submission<>(cancel, s);
+  static <T> SubmissionJdbc<T> submit(Supplier<Boolean> cancel, CompletionStage<T> s) {
+    return new SubmissionJdbc<>(cancel, s);
   }
   
-  protected Submission(Supplier<Boolean> can, CompletionStage<T> stg) {
+  protected SubmissionJdbc(Supplier<Boolean> can, CompletionStage<T> stg) {
     cancel = can;
     stage = stg;
   }

@@ -45,7 +45,7 @@ import java.util.function.Consumer;
  * CompletionStage of the preceeding Operation.
  *
  */
-abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
+abstract class OperationJdbc<T> implements jdk.incubator.sql2.Operation<T> {
   
   private static final Map<Class, SQLType> CLASS_TO_JDBCTYPE = new HashMap<>(20);
   static {
@@ -164,23 +164,23 @@ abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
   protected Consumer<Throwable> errorHandler = null;
   
   // internal state
-  protected final Session session;
-  protected final OperationGroup<T, ?> group;
+  protected final SessionJdbc session;
+  protected final OperationGroupJdbc<T, ?> group;
   protected OperationLifecycle operationLifecycle = OperationLifecycle.MUTABLE;
   
   // used only by Session
-  protected Operation() {
-    session = (Session)this;
-    group = (OperationGroup)this;
+  protected OperationJdbc() {
+    session = (SessionJdbc)this;
+    group = (OperationGroupJdbc)this;
   }
 
-  Operation(Session session, OperationGroup operationGroup) {
+  OperationJdbc(SessionJdbc session, OperationGroupJdbc operationGroup) {
     this.session = session;
     group = operationGroup;
   }
 
   @Override
-  public Operation<T> onError(Consumer<Throwable> handler) {
+  public OperationJdbc<T> onError(Consumer<Throwable> handler) {
     if (isImmutable() || errorHandler != null) {
       throw new IllegalStateException("TODO");
     }
@@ -192,7 +192,7 @@ abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
   }
 
   @Override
-  public Operation<T> timeout(Duration minTime) {
+  public OperationJdbc<T> timeout(Duration minTime) {
     if (isImmutable() || timeout != null) {
       throw new IllegalStateException("TODO");
     }
@@ -222,7 +222,7 @@ abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
     return operationLifecycle.isImmutable();
   }
 
-  protected Operation<T> immutable() {
+  protected OperationJdbc<T> immutable() {
     operationLifecycle = OperationLifecycle.RELEASED;
     return this;
   }
@@ -247,7 +247,7 @@ abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
    * but completion of the tail should result in completion of the returned
    * CompletableFuture. (Note: Not quite true for OperationGroups. While the 
    * returned CompletableFuture does depend on the tail, it also depends on 
-   * user code calling {@link OperationGroup#close()}.)
+   * user code calling {@link OperationGroupJdbc#close()}.)
    *
    * @param tail the predecessor of this operation. Completion of tail starts
    * execution of this Operation
@@ -271,7 +271,7 @@ abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
     return operationLifecycle.isCanceled();
   }
   
-  Operation<T> checkCanceled() {
+  OperationJdbc<T> checkCanceled() {
     if (isCanceled()) {
       throw new SqlSkippedException("TODO", null, null, -1, null, -1);
     }
@@ -280,25 +280,25 @@ abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
 
   /**
    * Attaches a completion stage which handles completion of the stage returned
-   * by {@link Operation#follows(CompletionStage, Executor)}.
+   * by {@link OperationJdbc#follows(CompletionStage, Executor)}.
    * <br>
    * If the session is aborted, the attached stage will complete exceptionally 
    * with a RuntimeException, with any exceptional completion from the 
    * argument added as a suppressed exception. Neither 
-   * {@link Operation#handleResult(Object)} nor 
-   * {@link Operation#handleError(Throwable)} will be called.
+   * {@link OperationJdbc#handleResult(Object)} nor 
+   * {@link OperationJdbc#handleError(Throwable)} will be called.
    * <br>
    * If the argument completes normally, it's computed value is passed to 
-   * {@link Operation#handleResult(Object)}, and the returned value completes 
+   * {@link OperationJdbc#handleResult(Object)}, and the returned value completes 
    * the the stage returned by this method. 
    * <br>
    * Otherwise, if the argument completes exceptionally, the 
    * CompletetionException's cause is passed to 
-   * {@link Operation#handleError(Throwable)}, and the returned Throwable 
+   * {@link OperationJdbc#handleError(Throwable)}, and the returned Throwable 
    * exceptionally completes the stage returned by this method.  
    * 
    * @param result A CompletionStage returned by 
-   *   {@link Operation#follows(CompletionStage, Executor)}.
+   *   {@link OperationJdbc#follows(CompletionStage, Executor)}.
    * @return a CompletionStage that will handle the argument's completion.
    */
   final CompletionStage<T> attachCompletionHandler(CompletionStage<T> result) {
@@ -332,15 +332,15 @@ abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
    * Handle the result of this operation.
    * <br>
    * The {@code result} argument is the value computed by the 
-   * {@link Operation#follows(CompletionStage, Executor)} stage. This method
+   * {@link OperationJdbc#follows(CompletionStage, Executor)} stage. This method
    * is only called when the stage completes normally.
    *  
    * @implSpec Operation's implementation of this method will pass the 
    * {@code result} argument to the
-   * {@link OperationGroup#accumulateResult(Object)} method of this 
+   * {@link OperationGroupJdbc#accumulateResult(Object)} method of this 
    * operation's group.  
    * @param result The result of the 
-   * {@link Operation#follows(CompletionStage, Executor)} stage.
+   * {@link OperationJdbc#follows(CompletionStage, Executor)} stage.
    * @return The result of this operation.
    */
   protected T handleResult(T result) {
@@ -350,14 +350,14 @@ abstract class Operation<T> implements jdk.incubator.sql2.Operation<T> {
   
   /**
    * Handle exceptional completion of this operation. The {@code ex} argument
-   * is the result of the {@link Operation#follows(CompletionStage, Executor)}
+   * is the result of the {@link OperationJdbc#follows(CompletionStage, Executor)}
    * stage. This method is only called when the stage completes exceptionally. 
    * Assuming the stage completed exceptionally with a 
    * {@link CompletionException}, the {@code ex} argument is the return value
    * of {@link CompletionException#getCause()}.
    *  
    * @implSpec Operation's implementation of this method will invoke any 
-   *   handler defined by {@link Operation#onError(Consumer)}. If 
+   *   handler defined by {@link OperationJdbc#onError(Consumer)}. If 
    *   the {@code ex} argument is not a SqlSkippedException, this 
    *   implementation returns a SqlSkippedException with {@code ex} as it's 
    *   cause. Otherwise, {@code ex} is returned as is.

@@ -40,7 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static com.oracle.adbaoverjdbc.JdbcConnectionProperties.JDBC_CONNECTION_PROPERTIES;
+import static com.oracle.adbaoverjdbc.ConnectionPropertiesJdbc.JDBC_CONNECTION_PROPERTIES;
 import jdk.incubator.sql2.Result;
 import jdk.incubator.sql2.RowCountOperation;
 import jdk.incubator.sql2.RowOperation;

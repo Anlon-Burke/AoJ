@@ -34,7 +34,7 @@ import jdk.incubator.sql2.Result;
  *
  * @param <T>
  */
-class ArrayCountOperation<T> extends ParameterizedOperation<T>
+class ArrayCountOperationJdbc<T> extends ParameterizedOperationJdbc<T>
         implements ArrayRowCountOperation<T> {
   
   private static final Collector DEFAULT_COLLECTOR = Collector.of(
@@ -53,8 +53,8 @@ class ArrayCountOperation<T> extends ParameterizedOperation<T>
    * @param sql the SQL string to execute. Must return a count.
    * @return a new ArrayCountOperation that will execute sql.
    */
-  static <S> ArrayCountOperation<S> newArrayCountOperation(Session session, OperationGroup grp, String sql) {
-    return new ArrayCountOperation<>(session, grp, sql);
+  static <S> ArrayCountOperationJdbc<S> newArrayCountOperation(SessionJdbc session, OperationGroupJdbc grp, String sql) {
+    return new ArrayCountOperationJdbc<>(session, grp, sql);
   }
   
   // attributes
@@ -63,7 +63,7 @@ class ArrayCountOperation<T> extends ParameterizedOperation<T>
   
   PreparedStatement jdbcStatement;
 
-  ArrayCountOperation(Session session, OperationGroup operationGroup, String sql) {
+  ArrayCountOperationJdbc(SessionJdbc session, OperationGroupJdbc operationGroup, String sql) {
     super(session, operationGroup);
     countCollector = DEFAULT_COLLECTOR;
     sqlString = sql;
@@ -153,44 +153,44 @@ class ArrayCountOperation<T> extends ParameterizedOperation<T>
   // Covariant overrides
   
   @Override
-  public ArrayCountOperation<T> set(String id, List<?> values) {
-    return (ArrayCountOperation<T>)super.set(id, values);
+  public ArrayCountOperationJdbc<T> set(String id, List<?> values) {
+    return (ArrayCountOperationJdbc<T>)super.set(id, values);
   }
 
   @Override
-  public ArrayCountOperation<T> set(String id, List<?> values, SqlType type) {
-    return (ArrayCountOperation<T>)super.set(id, values, type);
+  public ArrayCountOperationJdbc<T> set(String id, List<?> values, SqlType type) {
+    return (ArrayCountOperationJdbc<T>)super.set(id, values, type);
   }
 
   @Override
   public <S> ArrayRowCountOperation<T> set(String id, S[] values, SqlType type) {
-    return (ArrayCountOperation<T>)super.set(id, values, type);
+    return (ArrayCountOperationJdbc<T>)super.set(id, values, type);
   }
   
   @Override
   public <S> ArrayRowCountOperation<T> set(String id, S[] values) {
-    return (ArrayCountOperation<T>)super.set(id, values);
+    return (ArrayCountOperationJdbc<T>)super.set(id, values);
   }
   
   
   @Override
-  public ArrayCountOperation<T> set(String id, CompletionStage<?> source) {
-    return (ArrayCountOperation<T>)super.set(id, source);
+  public ArrayCountOperationJdbc<T> set(String id, CompletionStage<?> source) {
+    return (ArrayCountOperationJdbc<T>)super.set(id, source);
   }
 
   @Override
-  public ArrayCountOperation<T> set(String id, CompletionStage<?> source, SqlType type) {
-    return (ArrayCountOperation<T>)super.set(id, source, type);
+  public ArrayCountOperationJdbc<T> set(String id, CompletionStage<?> source, SqlType type) {
+    return (ArrayCountOperationJdbc<T>)super.set(id, source, type);
   }
 
   @Override
-  public ArrayCountOperation<T> timeout(Duration minTime) {
-    return (ArrayCountOperation<T>)super.timeout(minTime);
+  public ArrayCountOperationJdbc<T> timeout(Duration minTime) {
+    return (ArrayCountOperationJdbc<T>)super.timeout(minTime);
   }
 
   @Override
-  public ArrayCountOperation<T> onError(Consumer<Throwable> handler) {
-    return (ArrayCountOperation<T>)super.onError(handler);
+  public ArrayCountOperationJdbc<T> onError(Consumer<Throwable> handler) {
+    return (ArrayCountOperationJdbc<T>)super.onError(handler);
   }
 
 }

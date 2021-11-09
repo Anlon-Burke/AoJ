@@ -38,11 +38,11 @@ import jdk.incubator.sql2.Result;
  * separate CompletionStages. This class does so to break up this large synchronous
  * action into smaller tasks so as to avoid hogging a thread.
  */
-class RowPublisherOperation<T>  extends RowBaseOperation<T> 
+class RowPublisherOperationJdbc<T>  extends RowBaseOperation<T> 
         implements jdk.incubator.sql2.ParameterizedRowPublisherOperation<T> {
   
   
-  private static Logger logger = OperationGroup.NULL_LOGGER;
+  private static Logger logger = OperationGroupJdbc.NULL_LOGGER;
 
 
   static final Subscriber<? super Result.RowColumn> DEFAULT_SUBSCRIBER = new Flow.Subscriber<Result.RowColumn>() {
@@ -74,8 +74,8 @@ class RowPublisherOperation<T>  extends RowBaseOperation<T>
           }            
     };
   
-  static <S> RowPublisherOperation<S> newRowPublisherOperation(Session session, OperationGroup grp, String sql) {
-    return new RowPublisherOperation<>(session, grp, sql);
+  static <S> RowPublisherOperationJdbc<S> newRowPublisherOperation(SessionJdbc session, OperationGroupJdbc grp, String sql) {
+    return new RowPublisherOperationJdbc<>(session, grp, sql);
   }
   
   // attributes
@@ -89,7 +89,7 @@ class RowPublisherOperation<T>  extends RowBaseOperation<T>
   private boolean cancelSubscription;
   
 
-  protected RowPublisherOperation(Session session, OperationGroup grp, String sql) {
+  protected RowPublisherOperationJdbc(SessionJdbc session, OperationGroupJdbc grp, String sql) {
     super(session, grp, sql);
     subscriber = DEFAULT_SUBSCRIBER;
     result = null;
@@ -263,41 +263,41 @@ class RowPublisherOperation<T>  extends RowBaseOperation<T>
   }
 
   @Override
-  public RowPublisherOperation<T> onError(Consumer<Throwable> handler) {
-    return (RowPublisherOperation<T>)super.onError(handler);
+  public RowPublisherOperationJdbc<T> onError(Consumer<Throwable> handler) {
+    return (RowPublisherOperationJdbc<T>)super.onError(handler);
   }
 
   @Override
-  public RowPublisherOperation<T> timeout(Duration minTime) {
-    return (RowPublisherOperation<T>)super.timeout(minTime);
+  public RowPublisherOperationJdbc<T> timeout(Duration minTime) {
+    return (RowPublisherOperationJdbc<T>)super.timeout(minTime);
   }
 
   @Override
-  public RowPublisherOperation<T> set(String id, Object value, SqlType type) {
-    return (RowPublisherOperation<T>)super.set(id, value, type);
+  public RowPublisherOperationJdbc<T> set(String id, Object value, SqlType type) {
+    return (RowPublisherOperationJdbc<T>)super.set(id, value, type);
   }
 
   @Override
-  public RowPublisherOperation<T> set(String id, CompletionStage<?> source, SqlType type) {
-    return (RowPublisherOperation<T>)super.set(id, source, type);
+  public RowPublisherOperationJdbc<T> set(String id, CompletionStage<?> source, SqlType type) {
+    return (RowPublisherOperationJdbc<T>)super.set(id, source, type);
   }
 
   @Override
-  public RowPublisherOperation<T> set(String id, CompletionStage<?> source) {
-    return (RowPublisherOperation<T>)super.set(id, source);
+  public RowPublisherOperationJdbc<T> set(String id, CompletionStage<?> source) {
+    return (RowPublisherOperationJdbc<T>)super.set(id, source);
   }
 
   @Override
-  public RowPublisherOperation<T> set(String id, Object value) {
-    return (RowPublisherOperation<T>)super.set(id, value);
+  public RowPublisherOperationJdbc<T> set(String id, Object value) {
+    return (RowPublisherOperationJdbc<T>)super.set(id, value);
   }
 
   private class RowColumnSubscription implements Subscription {
-    private final RowPublisherOperation publisher;
+    private final RowPublisherOperationJdbc publisher;
     private boolean isCancelled;
     
     
-    public RowColumnSubscription(RowPublisherOperation publisher) {
+    public RowColumnSubscription(RowPublisherOperationJdbc publisher) {
       this.publisher = publisher;
       isCancelled = false;
     }

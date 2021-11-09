@@ -24,10 +24,10 @@ import jdk.incubator.sql2.DataSourceProperty;
 /**
  *
  */
-class DataSourceBuilder implements jdk.incubator.sql2.DataSource.Builder {
+class DataSourceBuilderJdbc implements jdk.incubator.sql2.DataSource.Builder {
 
-  static DataSourceBuilder newDataSourceBuilder() {
-    return new DataSourceBuilder();
+  static DataSourceBuilderJdbc newDataSourceBuilder() {
+    return new DataSourceBuilderJdbc();
   }
 
   protected boolean isBuilt = false;
@@ -115,7 +115,7 @@ class DataSourceBuilder implements jdk.incubator.sql2.DataSource.Builder {
       throw new IllegalStateException("cannot build more than once. All objects are use-once");
     }
     isBuilt = true;
-    return DataSource.newDataSource(defaultSessionProperties, requiredSessionProperties);
+    return DataSourceJdbc.newDataSource(defaultSessionProperties, requiredSessionProperties);
   }
 
   /**

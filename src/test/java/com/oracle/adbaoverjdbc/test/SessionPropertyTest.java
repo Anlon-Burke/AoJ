@@ -23,7 +23,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import com.oracle.adbaoverjdbc.JdbcConnectionProperties;
+import com.oracle.adbaoverjdbc.ConnectionPropertiesJdbc;
 
 import jdk.incubator.sql2.SessionProperty;
 
@@ -56,7 +56,7 @@ public class SessionPropertyTest {
   @Test
   public void testJdbcConnectionProperties() {
     SessionProperty jdbcProps = 
-      JdbcConnectionProperties.JDBC_CONNECTION_PROPERTIES;
+      ConnectionPropertiesJdbc.JDBC_CONNECTION_PROPERTIES;
     
     assertEquals("JDBC_CONNECTION_PROPERTIES", jdbcProps.name());
     assertEquals(Properties.class, jdbcProps.range());
@@ -71,7 +71,7 @@ public class SessionPropertyTest {
   @Test
   public void testSensitiveJdbcConnectionProperties() {
     SessionProperty sensitiveJdbcProps = 
-      JdbcConnectionProperties.SENSITIVE_JDBC_CONNECTION_PROPERTIES;
+      ConnectionPropertiesJdbc.SENSITIVE_JDBC_CONNECTION_PROPERTIES;
     
     assertEquals("SENSITIVE_JDBC_CONNECTION_PROPERTIES", 
                  sensitiveJdbcProps.name());

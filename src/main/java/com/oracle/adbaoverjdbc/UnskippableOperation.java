@@ -24,14 +24,14 @@ import java.util.function.Function;
  */
 class UnskippableOperation<T> extends SimpleOperation<T> {
   
-  static <S> UnskippableOperation<S> newOperation(Session session,
-                                             OperationGroup<? super S, ?> group,
+  static <S> UnskippableOperation<S> newOperation(SessionJdbc session,
+                                             OperationGroupJdbc<? super S, ?> group,
                                              Function<SimpleOperation<S>, S> action) {
     return new UnskippableOperation<>(session, group, action);
   }
 
-  protected UnskippableOperation(Session session,
-                            OperationGroup<? super T, ?> operationGroup,
+  protected UnskippableOperation(SessionJdbc session,
+                            OperationGroupJdbc<? super T, ?> operationGroup,
                             Function<SimpleOperation<T>, T> action) {
     super(session, operationGroup, (Function<SimpleOperation<T>, T>)action);
   }

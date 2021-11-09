@@ -27,7 +27,7 @@ import jdk.incubator.sql2.SessionProperty;
 
 import org.junit.Test;
 
-import static com.oracle.adbaoverjdbc.JdbcConnectionProperties.*;
+import static com.oracle.adbaoverjdbc.ConnectionPropertiesJdbc.*;
 import static com.oracle.adbaoverjdbc.test.TestConfig.*;
 import static org.junit.Assert.*;
 

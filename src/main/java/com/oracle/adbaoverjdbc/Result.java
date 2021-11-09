@@ -35,7 +35,7 @@ abstract class Result {
         return new Result.RowColumn(op);
     }
     
-    static jdk.incubator.sql2.Result.OutColumn newOutColumn(OutOperation op) {
+    static jdk.incubator.sql2.Result.OutColumn newOutColumn(OutOperationJdbc op) {
       try {
         return new Result.OutColumn(op, 
                                     op.jdbcCallableStmt()
@@ -335,7 +335,7 @@ abstract class Result {
         try {
           int jdbcType = rowOp.resultSet.getMetaData()
                            .getColumnType(index);
-          return Operation.fromSQLType(JDBCType.valueOf(jdbcType));
+          return OperationJdbc.fromSQLType(JDBCType.valueOf(jdbcType));
         }
         catch (SQLException ex) {
           throw new SqlException(ex.getMessage(), ex, ex.getSQLState(), 
@@ -370,9 +370,9 @@ abstract class Result {
     private static final class OutColumn extends Column 
       implements jdk.incubator.sql2.Result.OutColumn {
         
-      private final OutOperation outOp;
+      private final OutOperationJdbc outOp;
       
-      OutColumn(OutOperation op, int sequenceLength) {
+      OutColumn(OutOperationJdbc op, int sequenceLength) {
         super(sequenceLength);
         outOp = op;
       }
@@ -395,7 +395,7 @@ abstract class Result {
           int jdbcType = outOp.jdbcCallableStmt()
                            .getParameterMetaData()
                            .getParameterType(index);
-          return Operation.fromSQLType(JDBCType.valueOf(jdbcType));
+          return OperationJdbc.fromSQLType(JDBCType.valueOf(jdbcType));
         }
         catch (SQLException ex) {
           throw new SqlException(ex.getMessage(), ex, ex.getSQLState(), 

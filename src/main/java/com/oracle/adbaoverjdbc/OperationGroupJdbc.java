@@ -67,7 +67,7 @@ import jdk.incubator.sql2.TransactionCompletion;
  * @param <S> value type of member Operations
  * @param <T> value type of OperationGroup
  */
-class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T> 
+class OperationGroupJdbc<S, T> extends com.oracle.adbaoverjdbc.OperationJdbc<T> 
         implements jdk.incubator.sql2.OperationGroup<S, T> {
   
   static final Collector DEFAULT_COLLECTOR = Collector.of(
@@ -76,8 +76,8 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
           (a, b) -> null,
           a -> null);
 
-  static <U, V> OperationGroup<U, V> newOperationGroup(Session session) {
-    return new OperationGroup<U, V>(session, session);
+  static <U, V> OperationGroupJdbc<U, V> newOperationGroup(SessionJdbc session) {
+    return new OperationGroupJdbc<U, V>(session, session);
   }
   
   static final Logger NULL_LOGGER = Logger.getAnonymousLogger();
@@ -117,7 +117,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   private CompletionStage<S> memberTail;
   
   // used only by Session. Will break if used by any other class.
-  protected OperationGroup() {
+  protected OperationGroupJdbc() {
     super();
     held = new CompletableFuture();
     head = new CompletableFuture();
@@ -125,7 +125,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
     collector = DEFAULT_COLLECTOR;
   }
   
-  protected OperationGroup(Session session, OperationGroup<? super T, ?> group) {
+  protected OperationGroupJdbc(SessionJdbc session, OperationGroupJdbc<? super T, ?> group) {
     super(session, group);
     held = new CompletableFuture();
     head = new CompletableFuture();
@@ -186,7 +186,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   }
 
   @Override
-  public OperationGroup<S, T> collect(Collector<S, ?, T> c) {
+  public OperationGroupJdbc<S, T> collect(Collector<S, ?, T> c) {
     assertOpen();
     assertUnsubmitted();
     if (collector != DEFAULT_COLLECTOR) {
@@ -199,7 +199,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   }
   
   @Override
-  public Operation<S> catchOperation() {
+  public OperationJdbc<S> catchOperation() {
     assertOpen();
     return addMember(UnskippableOperation.newOperation(session, this, 
                                                        op -> null));
@@ -209,7 +209,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   public <R extends S> ArrayRowCountOperation<R> arrayRowCountOperation(String sql) {
     assertOpen();
     if (sql == null) throw new IllegalArgumentException("Null argument.");
-    return addMember(ArrayCountOperation.newArrayCountOperation(session, 
+    return addMember(ArrayCountOperationJdbc.newArrayCountOperation(session, 
                                                                 this, sql));
   }
 
@@ -217,7 +217,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   public <R extends S> ParameterizedRowCountOperation<R> rowCountOperation(String sql) {
     assertOpen();
     if (sql == null) throw new IllegalArgumentException("Null argument.");
-    return addMember(CountOperation.newCountOperation(session, this, sql));
+    return addMember(CountOperationJdbc.newCountOperation(session, this, sql));
  }
 
   @Override
@@ -231,21 +231,21 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   public <R extends S> jdk.incubator.sql2.OutOperation<R> outOperation(String sql) {
     assertOpen();
     if (sql == null) throw new IllegalArgumentException("TODO");
-    return addMember(OutOperation.newOutOperation(session, this, sql));
+    return addMember(OutOperationJdbc.newOutOperation(session, this, sql));
   }
 
   @Override
   public <R extends S> ParameterizedRowOperation<R> rowOperation(String sql) {
     assertOpen();
     if (sql == null) throw new IllegalArgumentException("Null argument.");
-    return addMember(RowOperation.newRowOperation(session, this, sql));
+    return addMember(RowOperationJdbc.newRowOperation(session, this, sql));
   }
 
   @Override
   public <R extends S> ParameterizedRowPublisherOperation<R> rowPublisherOperation(String sql) {
     assertOpen();
     if (sql == null) throw new IllegalArgumentException("TODO");
-    return addMember(RowPublisherOperation.newRowPublisherOperation(
+    return addMember(RowPublisherOperationJdbc.newRowPublisherOperation(
                         session, this, sql));
   }
 
@@ -253,7 +253,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   public <R extends S> MultiOperation<R> multiOperation(String sql) {
     assertOpen();
     if (sql == null) throw new IllegalArgumentException("TODO");
-    return com.oracle.adbaoverjdbc.MultiOperation.newMultiOperation(session, this, sql);
+    return com.oracle.adbaoverjdbc.MultiOperationJdbc.newMultiOperation(session, this, sql);
   }
 
   @Override
@@ -262,11 +262,11 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
     // TODO If member type S != TransactionOutcome ???
     SimpleOperation<TransactionOutcome> newOp = 
       SimpleOperation.<TransactionOutcome>newOperation(session, 
-        (OperationGroup<Object,T>)this, 
+        (OperationGroupJdbc<Object,T>)this, 
         op -> session.jdbcEndTransaction(op, 
-                        (com.oracle.adbaoverjdbc.TransactionCompletion)trans)
+                        (com.oracle.adbaoverjdbc.TransactionCompletionJdbc)trans)
         );
-    addMember((Operation<S>)newOp);
+    addMember((OperationJdbc<S>)newOp);
     return newOp;
   }
 
@@ -274,7 +274,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   public <R extends S> LocalOperation<R> localOperation() {
     assertOpen();
     return addMember(
-      com.oracle.adbaoverjdbc.LocalOperation.newOperation(session, this));
+      com.oracle.adbaoverjdbc.LocalOperationJdbc.newOperation(session, this));
   }
 
   @Override
@@ -285,13 +285,13 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   }
 
   @Override
-  public OperationGroup<S, T> timeout(Duration minTime) {
+  public OperationGroupJdbc<S, T> timeout(Duration minTime) {
     super.timeout(minTime);
     return this;
   }
 
   @Override
-  public OperationGroup<S, T> onError(Consumer<Throwable> handler) {
+  public OperationGroupJdbc<S, T> onError(Consumer<Throwable> handler) {
     super.onError(handler);
     return this;
   }
@@ -299,9 +299,9 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
   
   // Internal methods
   
-  Submission<S> submit(Operation<S> op) {      
+  Submission<S> submit(OperationJdbc<S> op) {      
     memberTail = op.attachCompletionHandler(op.follows(memberTail, getExecutor()));
-    return com.oracle.adbaoverjdbc.Submission.submit(this::cancel, memberTail);
+    return com.oracle.adbaoverjdbc.SubmissionJdbc.submit(this::cancel, memberTail);
   }
 
   @Override
@@ -362,7 +362,7 @@ class OperationGroup<S, T> extends com.oracle.adbaoverjdbc.Operation<T>
    * @return The same instance which was provided as the <code>member</code> 
    *   argument. 
    */
-  protected <U extends Operation<? extends S>> U addMember(U member) {
+  protected <U extends OperationJdbc<? extends S>> U addMember(U member) {
     hasCreatedMember = true;
     return member;
   }

@@ -31,7 +31,7 @@ import java.util.logging.Level;
 import jdk.incubator.sql2.ParameterizedRowCountOperation;
 import jdk.incubator.sql2.Result;
 
-class CountOperation<T> extends ParameterizedOperation<T>
+class CountOperationJdbc<T> extends ParameterizedOperationJdbc<T>
         implements ParameterizedRowCountOperation<T> {
   
   static private final Function DEFAULT_PROCESSOR = c -> null;
@@ -45,8 +45,8 @@ class CountOperation<T> extends ParameterizedOperation<T>
    * @param sql the SQL string to execute. Must return a count.
    * @return a new CountOperation that will execute sql.
    */
-  static <S> CountOperation<S> newCountOperation(Session session, OperationGroup grp, String sql) {
-    return new CountOperation<>(session, grp, sql);
+  static <S> CountOperationJdbc<S> newCountOperation(SessionJdbc session, OperationGroupJdbc grp, String sql) {
+    return new CountOperationJdbc<>(session, grp, sql);
   }
   
   // attributes
@@ -57,7 +57,7 @@ class CountOperation<T> extends ParameterizedOperation<T>
   private GeneratedKeysRowOperation rowOperation;
   private String autoKeyColNames[];
 
-  CountOperation(Session session, OperationGroup operationGroup, String sql) {
+  CountOperationJdbc(SessionJdbc session, OperationGroupJdbc operationGroup, String sql) {
     super(session, operationGroup);
     countProcessor = DEFAULT_PROCESSOR;
     sqlString = sql;
@@ -73,7 +73,7 @@ class CountOperation<T> extends ParameterizedOperation<T>
   }
 
   @Override
-  public CountOperation<T> apply(Function<Result.RowCount, ? extends T> processor) {
+  public CountOperationJdbc<T> apply(Function<Result.RowCount, ? extends T> processor) {
     if (isImmutable() || countProcessor != DEFAULT_PROCESSOR) throw new IllegalStateException("TODO");
     if (processor == null) throw new IllegalArgumentException("TODO");
     countProcessor = processor;
@@ -127,33 +127,33 @@ class CountOperation<T> extends ParameterizedOperation<T>
   // Covariant overrides
   
   @Override
-  public CountOperation<T> set(String id, Object value) {
-    return (CountOperation<T>)super.set(id, value);
+  public CountOperationJdbc<T> set(String id, Object value) {
+    return (CountOperationJdbc<T>)super.set(id, value);
   }
 
   @Override
-  public CountOperation<T> set(String id, Object value, SqlType type) {
-    return (CountOperation<T>)super.set(id, value, type);
+  public CountOperationJdbc<T> set(String id, Object value, SqlType type) {
+    return (CountOperationJdbc<T>)super.set(id, value, type);
   }
 
   @Override
-  public CountOperation<T> set(String id, CompletionStage<?> source) {
-    return (CountOperation<T>)super.set(id, source);
+  public CountOperationJdbc<T> set(String id, CompletionStage<?> source) {
+    return (CountOperationJdbc<T>)super.set(id, source);
   }
 
   @Override
-  public CountOperation<T> set(String id, CompletionStage<?> source, SqlType type) {
-    return (CountOperation<T>)super.set(id, source, type);
+  public CountOperationJdbc<T> set(String id, CompletionStage<?> source, SqlType type) {
+    return (CountOperationJdbc<T>)super.set(id, source, type);
   }
 
   @Override
-  public CountOperation<T> timeout(Duration minTime) {
-    return (CountOperation<T>)super.timeout(minTime);
+  public CountOperationJdbc<T> timeout(Duration minTime) {
+    return (CountOperationJdbc<T>)super.timeout(minTime);
   }
 
   @Override
-  public CountOperation<T> onError(Consumer<Throwable> handler) {
-    return (CountOperation<T>)super.onError(handler);
+  public CountOperationJdbc<T> onError(Consumer<Throwable> handler) {
+    return (CountOperationJdbc<T>)super.onError(handler);
   }
 
   /** 
@@ -184,11 +184,11 @@ class CountOperation<T> extends ParameterizedOperation<T>
    * underlying ResultSet is obtained during execution of the CountOperation.
    */
   private class GeneratedKeysRowOperation 
-    extends com.oracle.adbaoverjdbc.RowOperation<T> {
+    extends com.oracle.adbaoverjdbc.RowOperationJdbc<T> {
      
     private final CompletableFuture<T> resultCF;
  
-    GeneratedKeysRowOperation(Session session, OperationGroup<T, ?> operationGroup) {
+    GeneratedKeysRowOperation(SessionJdbc session, OperationGroupJdbc<T, ?> operationGroup) {
       super(session, operationGroup, null);
       resultCF = new CompletableFuture<>();
     }

@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 import jdk.incubator.sql2.Session.Lifecycle;
 import jdk.incubator.sql2.Session.SessionLifecycleListener;
 
-class LocalOperation<T> extends SimpleOperation<T> 
+class LocalOperationJdbc<T> extends SimpleOperation<T> 
   implements jdk.incubator.sql2.LocalOperation<T> {
 
   /** 
@@ -60,22 +60,22 @@ class LocalOperation<T> extends SimpleOperation<T>
   private SessionLifecycleListener abortListener;
 
   @SuppressWarnings("unchecked")
-  private LocalOperation(Session session,
-                         OperationGroup<? super T, ?> operationGroup) {
+  private LocalOperationJdbc(SessionJdbc session,
+                         OperationGroupJdbc<? super T, ?> operationGroup) {
     super(session, operationGroup, 
-          thisOp -> ((LocalOperation<T>)thisOp).execute());
+          thisOp -> ((LocalOperationJdbc<T>)thisOp).execute());
     action = (Callable<T>) DEFAULT_ACTION;
     stateRef = new AtomicReference<>(
                  ExecutionState.NOT_EXECUTING);
   }
   
-  static <S, R extends S> LocalOperation<R> newOperation(
-    Session session, OperationGroup<S, ?> group) {
-    return new LocalOperation<>(session, group);
+  static <S, R extends S> LocalOperationJdbc<R> newOperation(
+    SessionJdbc session, OperationGroupJdbc<S, ?> group) {
+    return new LocalOperationJdbc<>(session, group);
   }
   
   @Override
-  public LocalOperation<T> onExecution(Callable<T> action) {
+  public LocalOperationJdbc<T> onExecution(Callable<T> action) {
     
     if (isImmutable())
       throw new IllegalStateException("This operation is submitted.");
@@ -94,13 +94,13 @@ class LocalOperation<T> extends SimpleOperation<T>
   }
   
   @Override
-  public LocalOperation<T> onError(Consumer<Throwable> handler) {
-    return (LocalOperation<T>) super.onError(handler);
+  public LocalOperationJdbc<T> onError(Consumer<Throwable> handler) {
+    return (LocalOperationJdbc<T>) super.onError(handler);
   }
 
   @Override
-  public LocalOperation<T> timeout(Duration minTime) {
-    return (LocalOperation<T>) super.timeout(minTime);
+  public LocalOperationJdbc<T> timeout(Duration minTime) {
+    return (LocalOperationJdbc<T>) super.timeout(minTime);
   }
   
   @Override

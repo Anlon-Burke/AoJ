@@ -27,13 +27,13 @@ import java.util.concurrent.CompletionStage;
 /**
  *
  */
-public abstract class ParameterizedOperation<T> extends Operation<T>
+public abstract class ParameterizedOperationJdbc<T> extends OperationJdbc<T>
         implements jdk.incubator.sql2.ParameterizedOperation<T> {
   
   protected final Map<String, ParameterValue> setParameters;
   protected CompletionStage futureParameters;
 
-  ParameterizedOperation(Session session, OperationGroup operationGroup) {
+  ParameterizedOperationJdbc(SessionJdbc session, OperationGroupJdbc operationGroup) {
     super(session, operationGroup);
     setParameters = new HashMap<>();
   }
@@ -44,7 +44,7 @@ public abstract class ParameterizedOperation<T> extends Operation<T>
   }
 
   @Override
-  public ParameterizedOperation<T> set(String id, Object value, SqlType type) {
+  public ParameterizedOperationJdbc<T> set(String id, Object value, SqlType type) {
     if (isImmutable() || setParameters.containsKey(id)) {
       throw new IllegalStateException("TODO");
     }
@@ -69,17 +69,17 @@ public abstract class ParameterizedOperation<T> extends Operation<T>
   }
   
   @Override
-  public ParameterizedOperation<T> set(String id, CompletionStage<?> source, SqlType type) {
+  public ParameterizedOperationJdbc<T> set(String id, CompletionStage<?> source, SqlType type) {
     return set(id, (Object) source, type);
   }
 
   @Override
-  public ParameterizedOperation<T> set(String id, CompletionStage<?> source) {
+  public ParameterizedOperationJdbc<T> set(String id, CompletionStage<?> source) {
     return set(id, (Object) source, null);
   }
 
   @Override
-  public ParameterizedOperation<T> set(String id, Object value) {
+  public ParameterizedOperationJdbc<T> set(String id, Object value) {
     return set(id, value, null);
   }
   

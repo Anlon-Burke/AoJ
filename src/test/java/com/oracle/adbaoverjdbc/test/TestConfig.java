@@ -155,7 +155,7 @@ class TestConfig {
      * default value is com.oracle.adbaoverjdbc.DataSourceFactory
      */
     DATASOURCE_FACTORY(
-      com.oracle.adbaoverjdbc.DataSourceFactory.class.getName())
+      com.oracle.adbaoverjdbc.DataSourceFactoryJdbc.class.getName())
     
     ;
 
